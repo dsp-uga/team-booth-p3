@@ -3,7 +3,10 @@
 import numpy as np
 import cv2
 import glob
+import os
 from matplotlib import pyplot as plt
+import argparse
+import re
 
 #===========#
 ## SUMMARY ##
@@ -32,34 +35,46 @@ from matplotlib import pyplot as plt
 def convertToBlackAndWhite(args, imageList):
     # Loop through all files
     for imageName in imageList:
-        img = cv2.imread(args.sourceDir+"/"+imageName)
-        channels = cv2.split(img)
-        h = channels[1].shape[0]
-        w = channels[1].shape[1]
-        for y in range(0,h):
-            for x in range(0,w):
-                if( channels[1][y,x] > 0 ):
-                    channels[1][y,x] = 1
-                else:
-                    channels[1][y,x] = 0
         imageName = imageName.replace(".tiff",".png")
-        plt.imsave(args.workDir+"/"+imageName,channels[1],cmap='gray')
+        if not os.path.exists(args.workDir+"/"+imageName):
+            img = cv2.imread(args.sourceDir+"/"+imageName)
+            channels = cv2.split(img)
+            h = channels[1].shape[0]
+            w = channels[1].shape[1]
+            for y in range(0,h):
+                for x in range(0,w):
+                    if( channels[1][y,x] > 0 ):
+                        channels[1][y,x] = 1
+                    else:
+                        channels[1][y,x] = 0
+            plt.imsave(args.workDir+"/"+imageName,channels[1],cmap='gray')
 
-def buildUnionChannels(args, imageListPng, startIdx ):
+def buildIntersectChannels(args, imageListPng, startIdx ):
     images = []
     for idx in range(0,args.sampleSize):
-        images.appeand(cv2.imread(args.workDir+"/"+imageimageListPng[startIdx+idx])
+        targIdx = startIdx+idx
+        name = cv2.imread(args.workDir+"/"+imageListPng[targIdx],0)
+        images.append(name)
     h = images[0].shape[0]
-    w = images[0].shape[0]
-    finalImage = cv2.imread(args.workDir+"/"+imageimageListPng[startIdx+idx]
-    for idx in range(0,args.sampleSize):
-        for y in range(0,h):
-            for x in range(0,w):
-                if( images[idx][y,x] == 1 and images[idx][y,x]==images[idx+1][y,x] ):
-                    finalImage[y,x] = 1
+    w = images[0].shape[1]
+    finalImage = cv2.imread(args.workDir+"/"+imageListPng[startIdx+idx],0)
+    for y in range(0,h):
+        for x in range(0,w):
+            for idx in range(0,args.sampleSize):
+                if( idx == 0 ):
+                    if( images[idx][y,x] == 255 and images[idx][y,x]==images[idx+1][y,x] ):
+                        finalImage[y,x] = 255
+                    else:
+                        finalImage[y,x] = 0
                 else:
-                    finalImage[y,x] = 0
-    plt.imsave(args.workDir+"/finalImage"+startIdx+"."+args.sampleSize+".png",cmap="gray")
+                    if( finalImage[y,x] == 255 and images[idx][y,x] == finalImage[y,x] ):
+                        finalImage[y,x] = 255
+                    else:
+                        finalImage[y,x] = 0
+            if( finalImage[y,x] == 255 ):
+                finalImage[y,x] = 1;
+    finalImage = cv2.bilateralFilter(finalImage, 9, 75, 75)
+    plt.imsave(args.workDir+"/finalImage"+str(startIdx)+"."+str(args.sampleSize)+".png",finalImage,cmap="gray",vmin=0,vmax=1.5)
 
 def main(args):
     # 
@@ -77,21 +92,27 @@ def main(args):
     if args.workDir.endswith("/"):
         args.workDir = args.workDir[:-1]
 
+    print(args.sourceDir + ", " + args.workDir)
+
     # Make a list of all files
-    imageList = [f for f in glob.glob("image*.tiff")]
+    imageList = [re.sub('^.*\/([^\/]+)$',r'\1',f) for f in glob.glob(args.sourceDir + "/image*.tiff")]
+
+    print("M1 - " + imageList[0])
 
     # Change the images to black and white
     convertToBlackAndWhite(args,imageList)
+    print("M2")
     imageListPng = []
     for imageName in imageList:
+        print("M3 - " + imageName)
         imageName = imageName.replace(".tiff",".png")
         imageListPng.append(imageName)
 
     # Process the image files to generate new image files
     for idx in range(0,len(imageListPng)-args.sampleSize):
-        buildUnionChannels(args,imageListPng,idx,idx+sampleSize)
-        print imageListPng[idx]
-        break
+        if not os.path.exists(args.workDir+"/finalImage"+str(idx)+"."+str(args.sampleSize)+".png"):
+            buildIntersectChannels(args,imageListPng,idx)
+            print(imageListPng[idx])
 
 
 if __name__ == '__main__':
@@ -100,12 +121,12 @@ if __name__ == '__main__':
     #
     parser = argparse.ArgumentParser(description='This is part of the UGA CSCI 8360 Project 3. Please vist our GitHub project at https://github.com/dsp-uga/team-booth-p3 for more information regarding data organizations, expectations, and examples on how to execute out scripts.')
 
-    parser.add_argumnet('-d','--sourceDir', required=True, help='The base directory storing neuron tiff images. Images are expected to have names that take the form imageXXXXX.tiff, where Xs are integers.')
-    parser.add_argumnet('-w','--workDir', required=True, help='A path to a working directory where files might be placed temporarily.')
-    parser.add_argumnet('-s','--sampleSize', required=False, type='int', default=4, help='Defines the number of consecutive images used to make initial guesses. (def. 4)')
-    parser.add_argumnet('-o','--outputFile', required=False, default='regions.json', help='Defines the output file to which this program will write predictions.')
+    parser.add_argument('-d','--sourceDir', required=True, help='The base directory storing neuron tiff images. Images are expected to have names that take the form imageXXXXX.tiff, where Xs are integers.')
+    parser.add_argument('-w','--workDir', required=True, help='A path to a working directory where files might be placed temporarily.')
+    parser.add_argument('-s','--sampleSize', required=False, type=int, default=5, help='Defines the number of consecutive images used to make initial guesses. (def. 4)')
+    parser.add_argument('-o','--outputFile', required=False, default='regions.json', help='Defines the output file to which this program will write predictions.')
 
-    args.parser.parse_args()
+    args = parser.parse_args()
     main(args)
 
 
