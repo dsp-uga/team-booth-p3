@@ -24,8 +24,7 @@ file_names = ['neurofinder.00.00','neurofinder.00.01',
              'neurofinder.00.01.test','neurofinder.01.00.test', 
              'neurofinder.01.01.test','neurofinder.02.00.test',
              'neurofinder.02.01.test','neurofinder.03.00.test', 
-             'neurofinder.04.00.test','neurofinder.04.01.test']
-             
+             'neurofinder.04.00.test','neurofinder.04.01.test']          
 
 def main(args):
     # Check to make sure the target directory exists

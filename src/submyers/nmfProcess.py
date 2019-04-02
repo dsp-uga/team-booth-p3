@@ -56,8 +56,8 @@ def readAllImages(args):
         imageList.append(skimage.io.imread(args.sourceDir+"/images/"+name, 
                                            as_gray=True))
         idx += 1
-        if idx > 100:
-            break
+        if idx%250 == 0:
+            print("idx = "+str(idx))
 """
 The clean images function takes advantage of a range of numpy functions that
 were shown potentially useful in the project https://github.com/dsp-uga/bath
@@ -71,7 +71,7 @@ def cleanImages(args):
         for idx in range(0,len(imageList)):
             image = imageList[idx]
             means = image.sum() / (image.shape[0] + image.shape[1])
-            stds = numpy(means)
+            stds = numpy.std(means)
             imageList[idx] = (image - means)/stds
 
 """
