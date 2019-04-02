@@ -21,6 +21,7 @@ from pyspark.sql import SparkSession
 import thunder as th
 from extraction import NMF
 import json
+import os
 
 
 # In[7]:
@@ -46,60 +47,33 @@ sc, Spark = configure_spark()
 # In[16]:
 
 
-path = '/home/mr_malviya/Desktop/P03_DSP/Data/project3_neurofinder.00.00.test/neurofinder.00.00.test/images/'
+datapath = '/home/mr_malviya/Desktop/P03_DSP/Data'
 
 
 # In[17]:
 
-
-data = th.images.fromtif(path , stop=10, ext='tiff', engine=sc, npartitions= 10)
-
-
-# In[19]:
-
-
-algorithm = NMF(k=10, percentile=99, max_iter=50, overlap=0.1)
-model = algorithm.fit(data, chunk_size=(50,50))
-merged = model.merge(0.1)
-
-
-# In[26]:
-
-
-regions = [{'coordinates': region.coordinates.tolist()} for region in merged.regions]
-result = [{'dataset': '00.00.test', 'regions': regions}]
+final_output = []
+final_regions = []
+for filename in os.listdir(datapath):
+    path = os.path.join(datapath,filename)
+    path = path + '/images'
+    data = th.images.fromtif(path , ext='tiff', engine=sc, npartitions= 10)
+    algorithm = NMF(k=10, percentile=99, max_iter=50, overlap=0.1)
+    model = algorithm.fit(data, chunk_size=(50,50))
+    merged = model.merge(0.1)
+    name = filename.split('.',1)[1]
+    for region in merged.regions:
+        coordinates = region.coordinates.tolist()
+        neuron = {'coordinates' : coordinates}
+        final_regions.append(neuron)
+    final_output.append({'dataset':name, 'regions':final_regions})
 
 
 # In[27]:
 
 
-with open('submission-' + '00.00'  +'.json', 'w') as f:
-	f.write(json.dumps(result))
-
-
-# In[34]:
-
-
-final_regions = []
-for region in merged.regions:
-    coordinates = region.coordinates.tolist()
-    neuron = {'coordinates' : coordinates}
-    final_regions.append(neuron)
-    
-
-
-# In[36]:
-
-
-output = [{'dataset':'00.00.test', 'regions':final_regions}]
-
-
-# In[38]:
-
-
-with open('p03-' + '00.00'  +'.json', 'w') as f:
-	f.write(json.dumps(result))
-
+with open('submission-' +'.json', 'w') as f:
+	f.write(json.dumps(final_output))
 
 
 
