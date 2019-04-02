@@ -50,7 +50,7 @@ The GitHub site https://github.com/codeneuro/neurofinder contains links to the "
 The Python script downloadNeuronData.py could download and extract all neurofinder data for you by executing the following command in our core directory:
 
 ```
-python downloadNeuronData.py -o ./data/
+$ python downloadNeuronData.py -o ./data/
 ```
 
 This command begins a process downloading all 26 files hard-coded into the script and supported by https://github.com/codeneuro/neurofinder: 17 for training and 9 for testing. Once you have directories storing neurofinder data, you are prepared to apply the filtering and NMF operations discussed in the following section.
