@@ -61,7 +61,7 @@ We looked to Thunder-Extraction (https://github.com/thunder-project/thunder-extr
 
 
 ```
-python nmfProcess.py -d data/neurofinder.00.00.test/ -o regions.00.00.test.json
+$ python nmfProcess.py -d data/neurofinder.00.00.test/ -o regions.00.00.test.json
 ```
 
 
