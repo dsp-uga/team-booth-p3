@@ -22,11 +22,11 @@ Packages
 import skimage #import io, filters
 import glob
 import os
-#from neurofinder import load as load_regions
 import re
 import argparse
 import numpy
 import json
+import cv2
 from extraction import NMF
 
 """
@@ -58,6 +58,7 @@ def readAllImages(args):
         idx += 1
         if idx%250 == 0:
             print("idx = "+str(idx))
+
 """
 The clean images function takes advantage of a range of numpy functions that
 were shown potentially useful in the project https://github.com/dsp-uga/bath
@@ -69,10 +70,7 @@ def cleanImages(args):
     # Normalize the image values if requested
     if( args.normalize ):
         for idx in range(0,len(imageList)):
-            image = imageList[idx]
-            means = image.sum() / (image.shape[0] + image.shape[1])
-            stds = numpy.std(means)
-            imageList[idx] = (image - means)/stds
+            cv2.normalize(imageList[idx], imageList[idx], 0, 255, cv2.NORM_MINMAX)
 
 """
 This is the core application function that calculates NMF for the images and
@@ -119,11 +117,6 @@ def main(args):
     if not os.path.exists(args.sourceDir):
         raise Exception("ERROR: The dir '" + args.sourceDir \
                         + "' does not exist")
-    if not os.path.exists(args.workDir):
-        raise Exception("ERROR: The dir '" + args.workDir + "' does not exist")
-    if args.sampleSize < 1 or args.sampleSize > 10:
-        raise Exception("ERROR: The sample size must be in the inclusive " \
-                        + "range 1 <= size <= 10")
     arr = re.split(",",args.fit_chunkSize)
     if len(arr)!=2 or not arr[0].isdigit() or not arr[1].isdigit():
         raise Exception("ERROR: The chunk size expects two integers comma "\
@@ -139,8 +132,6 @@ def main(args):
     
     if args.sourceDir.endswith("/"):
         args.sourceDir = args.sourceDir[:-1]
-    if args.workDir.endswith("/"):
-        args.workDir = args.workDir[:-1]
     
     # Start by reading in all images
     readAllImages(args)
@@ -174,13 +165,6 @@ if __name__ == '__main__':
                         'take the form imageXXXXX.tiff, where Xs are ' + \
                         'integers. The directory''s name is expected to '+ \
                         'be the sample name (ex neurofinder.00.00)')
-    parser.add_argument('-w','--workDir', required=True, help='A path to ' + \
-                        'a working directory where files might be placed ' + \
-                        'temporarily.')
-    parser.add_argument('-s','--sampleSize', required=False, type=int, \
-                        default=5, help='Defines the number of ' + \
-                        'consecutive images used to make initial guesses. ' + \
-                        '(def. 4)')
     parser.add_argument('-o','--outputFile', required=False, 
                         default='regions.json', help='Defines the output ' + \
                         'file to which this program will write predictions.')
@@ -207,8 +191,6 @@ if __name__ == '__main__':
     parser.add_argument('-merge_kNearest','--merge_kNearest', required=False, \
                         type=int, default=20, help='fill later...')
     
-    #parser.add_argument('-gb','--gaussianBlur',required=False, default=False, action='store_true', help='Apply Gaussian Blur to the image (default False)')
-
     args = parser.parse_args()
     main(args)
 
