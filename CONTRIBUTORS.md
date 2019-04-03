@@ -1,7 +1,8 @@
 #### ABHISHEK CHATRATH
 
 * Image processing filters
-* Helping tes=ammate with Thunder
+* Helping teammate with Thunder
+* Researching Tensorflow input pipeline to use it with Keras and Densenet
 
 #### JONATHAN MYERS
 * Downloading the data
