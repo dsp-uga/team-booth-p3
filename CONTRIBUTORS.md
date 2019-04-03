@@ -8,6 +8,7 @@
 * nmfProcess.py
 * Readme
 * Wiki
+* Ethics
 
 #### PRIYANK MALVIYA
 * thunder.py
