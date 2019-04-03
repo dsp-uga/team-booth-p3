@@ -1,6 +1,7 @@
 #### ABHISHEK CHATRATH
 
 * Image processing filters
+* Helping tes=ammate with Thunder
 
 #### JONATHAN MYERS
 * Downloading the data
