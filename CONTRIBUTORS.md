@@ -9,6 +9,8 @@
 * Readme
 * Wiki
 * Ethics
+* Presentation
+* GitHub management
 
 #### PRIYANK MALVIYA
 * thunder.py
