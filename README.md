@@ -45,7 +45,7 @@ PATH=/anaconda3/bin:$PATH
 
 ## Image Data
 
-The GitHub site https://github.com/codeneuro/neurofinder contains links to the "neurofinder" data we used to evaluate the efficiency of our software. Their website provides a nice introduction to the problem, expectations for the results generated, and links to software used to evaluate performance. DUE NOTE: The links on the page to neurofinder.04.00.test and neurofinder.04.01.test are incorrect; they should be https://s3.amazonaws.com/neuro.datasets/challenges/neurofinder/neurofinder.04.00.test.zip and https://s3.amazonaws.com/neuro.datasets/challenges/neurofinder/neurofinder.04.01.test.zip respectively.
+The GitHub site https://github.com/codeneuro/neurofinder contains links to the "neurofinder" data we used to evaluate the efficiency of our software. Their website provides a nice introduction to the problem, expectations for the results generated, and links to software used to evaluate performance. PLEASE NOTE: The links on the page to neurofinder.04.00.test and neurofinder.04.01.test are incorrect; they should be https://s3.amazonaws.com/neuro.datasets/challenges/neurofinder/neurofinder.04.00.test.zip and https://s3.amazonaws.com/neuro.datasets/challenges/neurofinder/neurofinder.04.01.test.zip respectively.
 
 The Python script downloadNeuronData.py could download and extract all neurofinder data for you by executing the following command in our core directory:
 
