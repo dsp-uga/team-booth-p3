@@ -8,7 +8,7 @@
 
 ## Synopsis
 
-We provide one Python script approach for downloading and analyzing microscopic images to derive neuron locations based on visible fluctuations in calcium concentration. Our software takes advantage of Non-Negative Matrix Factorization (NMF) to derive patterns in the image matrixes by building complementary base and factor matrices using gradient decent. These matrices serve, along with image adjustment, serve as a basis for predicting neuron locations.
+We provide one Python script approach for downloading and analyzing microscopic images to derive neuron locations based on visible fluctuations in calcium concentration. Our software takes advantage of Non-Negative Matrix Factorization (NMF) to derive patterns in the image matrixes by building complementary base and factor matrices using gradient decent. These matrices, along with image adjustment, serve as a basis for predicting neuron locations.
 
 ## Outline
 
